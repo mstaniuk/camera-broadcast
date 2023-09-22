@@ -65,7 +65,7 @@ class CameraManager {
       const {device, resolution, fps} = camera;
       const port = basePort + index + 1;
       // Specify the input plugin and its options
-      const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps}`];
+      const inputOptions = ['-i', `input_uvc.so -d ${device}`];
 
       // Specify the output plugin and its options
       const outputOptions = ['-o', `output_http.so -p ${port} -w ./www`];
