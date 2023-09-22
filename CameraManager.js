@@ -22,15 +22,17 @@ class CameraManager {
 
           // Check if the device has video capture capability
           if (details.includes('Video Capture')) {
-            const resolutionMatch = details.match(/(\d+)x(\d+)/);
-            const fpsMatch = details.match(/(\d+) fps/);
+            // Find resolution and fps using regular expressions
+            const resolutionMatch = details.match(/\b\d{3,}x\d{3,}\b/);
+            const fpsMatch = details.match(/\bframerate: (\d+) fps\b/);
 
-            const resolution = resolutionMatch ? resolutionMatch[0] : '640x480';
-            const fps = fpsMatch ? fpsMatch[1] : '30';
-
-            cameras.push({ device, resolution, fps });
+            // If resolution and fps are found, add the device to the cameras array
+            if (resolutionMatch && fpsMatch) {
+              const resolution = resolutionMatch[0];
+              const fps = fpsMatch[1];
+              cameras.push({ device, resolution, fps });
+            }
           }
-
         } catch (error) {
           console.error(`Failed to get details for device ${device}:`, error.message);
         }
@@ -39,6 +41,7 @@ class CameraManager {
 
     return cameras;
   }
+
 
   startStreams(basePort) {
     this.cameras.forEach((camera, index) => {
