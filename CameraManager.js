@@ -25,13 +25,13 @@ class CameraManager {
           const fpsPattern = /\((\d+).* fps\)/g;
 
           // Find all matching resolutions and frame rates
-          const resolutions = details.matchAll(resolutionPattern) || [];
-          const fpsList = details.match(fpsPattern) || [];
+          const resolutions = details.matchAll(resolutionPattern);
+          const fpsList = details.matchAll(fpsPattern);
 
           // If any resolutions and fps are found
-          if (resolutions.length > 0 && fpsList.length > 0) {
+          if (resolutions && fpsList) {
             // Sort and select the highest resolution
-            const highestResolution = resolutions.sort((a, b) => {
+            const highestResolution = [...resolutions].sort((a, b) => {
               if(a[1] && a[2] && b[1] && b[2]) {
                 const [aWidth, aHeight] = [a[1], a[2]].map(Number);
                 const [bWidth, bHeight] = [b[1], b[2]].map(Number);
@@ -40,7 +40,7 @@ class CameraManager {
             })[0];
 
             // Sort and select the highest fps
-            const highestFps = Math.max(...fpsList.filter(fps => fps[1]).map(fps => Number(fps)));
+            const highestFps = Math.max(...[...fpsList].filter(fps => fps[1]).map(fps => Number(fps)));
 
             // Add the device with the highest resolution and fps to the cameras array
             cameras.push({ device, resolution: highestResolution, fps: highestFps });
