@@ -31,19 +31,24 @@ class CameraManager {
           // If any resolutions and fps are found
           if (resolutions && fpsList) {
             // Sort and select the highest resolution
-            const highestResolution = [...resolutions].sort((a, b) => {
-              if(a[1] && a[2] && b[1] && b[2]) {
+            const highestResolutionEntry = [...resolutions].sort((a, b) => {
+              if (a[1] && a[2] && b[1] && b[2]) {
                 const [aWidth, aHeight] = [a[1], a[2]].map(Number);
                 const [bWidth, bHeight] = [b[1], b[2]].map(Number);
                 return (bWidth * bHeight) - (aWidth * aHeight);
               }
             })[0];
 
+
             // Sort and select the highest fps
-            const highestFps = Math.max(...[...fpsList].filter(fps => fps[1]).map(fps => Number(fps)));
+            const highestFps = Math.max(...[...fpsList].filter(fps => fps[1]).map(fps => Number(fps[1])));
 
             // Add the device with the highest resolution and fps to the cameras array
-            cameras.push({ device, resolution: highestResolution, fps: highestFps });
+            cameras.push({
+              device,
+              resolution: `${highestResolutionEntry[1]}x${highestResolutionEntry[2]}`,
+              fps: highestFps
+            });
           }
         } catch (error) {
           console.error(`Failed to get details for device ${device}:`, error.message);
@@ -53,7 +58,6 @@ class CameraManager {
 
     return cameras;
   }
-
 
 
   startStreams(basePort) {
