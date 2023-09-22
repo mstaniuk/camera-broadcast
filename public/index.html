@@ -22,7 +22,7 @@
       cameras.forEach((camera) => {
         const {url} = camera;
         const img = document.createElement('img');
-        img.src = `${location.protocol}://${url}?action=stream`;
+        img.src = `${location.protocol}//${url}?action=stream`;
 
         df.appendChild(img);
       });
