@@ -6,8 +6,35 @@
 </head>
 <body>
 <h1>Camera Streams</h1>
-<img src="/camera8081?action=stream" alt="Camera 1 Stream">
-<img src="/camera8082?action=stream" alt="Camera 2 Stream">
+<div id="streams"></div>
 <!-- Add more image elements for additional camera streams as needed -->
+<script>
+  fetch('/cameras').then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json()
+  }).then((cameras) => {
+    console.log(cameras);
+    if(Array.isArray(cameras)) {
+      const df = document.createDocumentFragment();
+
+      cameras.forEach((camera) => {
+        const {url} = camera;
+        const img = document.createElement('img');
+        img.src = `${url}?action=stream`;
+
+        df.appendChild(img);
+      });
+
+      document.getElementById('streams').appendChild(df);
+    } else {
+      console.error('Incorrect data format')
+    }
+  }).catch((error) =>{
+    console.error('Failed to fetch cameras:', error);
+  })
+
+</script>
 </body>
 </html>

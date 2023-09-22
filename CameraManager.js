@@ -64,11 +64,13 @@ class CameraManager {
     this.cameras.forEach((camera, index) => {
       const {device, resolution, fps} = camera;
       const port = basePort + index + 1;
+      camera.port = port;
+
       // Specify the input plugin and its options
-      const inputOptions = ['-i', `input_uvc.so -d ${device}`];
+      const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps}`];
 
       // Specify the output plugin and its options
-      const outputOptions = ['-o', `output_http.so -p ${port} -w ./www`];
+      const outputOptions = ['-o', `output_http.so -w ./www -p ${port}`];
 
       // Combine input and output options
       const mjpgOptions = [...inputOptions, ...outputOptions];
