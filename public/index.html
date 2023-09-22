@@ -20,9 +20,11 @@
       const df = document.createDocumentFragment();
 
       cameras.forEach((camera) => {
-        const {url} = camera;
+        const {url, resolution} = camera;
         const img = document.createElement('img');
         img.src = `${location.protocol}//${url}?action=stream`;
+        img.width = Number(resolution.split('x')[0]);
+        img.height = Number(resolution.split('x')[1]);
 
         df.appendChild(img);
       });
