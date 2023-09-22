@@ -3,19 +3,19 @@ const fs = require('fs');
 const path = require('path');
 
 class CameraManager {
-  constructor() {
-    this.cameras = this.detectCameras();
+  constructor(basePort = 8080) {
+    this.cameras = this.detectCameras(basePort);
     this.startStreams();
   }
 
-  detectCameras() {
+  detectCameras(basePort) {
     const videoDevicesPath = '/dev/';
     const cameras = [];
 
     fs.readdirSync(videoDevicesPath).forEach((file) => {
       if (file.startsWith('video')) {
         const device = path.join(videoDevicesPath, file);
-        cameras.push({ device, port: 8081 + cameras.length });
+        cameras.push({ device, port: basePort + 1 + cameras.length });
       }
     });
 
