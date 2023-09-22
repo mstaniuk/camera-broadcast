@@ -14,6 +14,7 @@ console.log(cameraManager.cameras);
 
 cameraManager.cameras.forEach((camera) => {
   const { port } = camera;
+  console.log({camera})
   app.use(`/camera${port}`, (req, res) => {
     const ip = getIPAddress();
     res.redirect(`http://${ip}:${port}`);
