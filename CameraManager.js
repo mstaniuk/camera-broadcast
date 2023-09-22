@@ -17,20 +17,34 @@ class CameraManager {
         const device = path.join(videoDevicesPath, file);
 
         try {
-          // Execute v4l2-ctl to get device details
-          const details = execSync(`v4l2-ctl --device=${device} --all`).toString();
+          // Execute v4l2-ctl to get device formats, resolutions, and frame rates
+          const details = execSync(`v4l2-ctl --list-formats-ext --device=${device}`).toString();
 
-          // Check if the device has video capture capability
-          if (details.includes('Video Capture')) {
-            // Find resolution and fps using regular expressions
-            const resolutionMatch = details.match(/\bWidth\/Height\s*:\s*(\d+)\/(\d+)\b/);
-            const fpsMatch = details.match(/\bFrames per second\s*:\s*(\d+)\b/);
+          // Regular expressions to find resolutions and frame rates
+          const resolutionPattern = /Size: Discrete (\d+)x(\d+)/g;
+          const fpsPattern = /\((\d+).* fps\)/g;
 
-            if(resolutionMatch && fpsMatch) {
-              cameras.push({device, resolution: `${resolutionMatch[1]}x${resolutionMatch[2]}`, fps: fpsMatch[1]});
-            }
+          // Find all matching resolutions and frame rates
+          const resolutions = details.matchAll(resolutionPattern) || [];
+          const fpsList = details.match(fpsPattern) || [];
+
+          // If any resolutions and fps are found
+          if (resolutions.length > 0 && fpsList.length > 0) {
+            // Sort and select the highest resolution
+            const highestResolution = resolutions.sort((a, b) => {
+              if(a[1] && a[2] && b[1] && b[2]) {
+                const [aWidth, aHeight] = [a[1], a[2]].map(Number);
+                const [bWidth, bHeight] = [b[1], b[2]].map(Number);
+                return (bWidth * bHeight) - (aWidth * aHeight);
+              }
+            })[0];
+
+            // Sort and select the highest fps
+            const highestFps = Math.max(...fpsList.filter(fps => fps[1]).map(fps => Number(fps)));
+
+            // Add the device with the highest resolution and fps to the cameras array
+            cameras.push({ device, resolution: highestResolution, fps: highestFps });
           }
-
         } catch (error) {
           console.error(`Failed to get details for device ${device}:`, error.message);
         }
@@ -39,6 +53,7 @@ class CameraManager {
 
     return cameras;
   }
+
 
 
   startStreams(basePort) {
