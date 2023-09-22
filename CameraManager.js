@@ -1,4 +1,4 @@
-const { spawn, execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -20,7 +20,17 @@ class CameraManager {
           // Execute v4l2-ctl to get device details
           const details = execSync(`v4l2-ctl --device=${device} --all`).toString();
 
-          cameras.push({ device, details });
+          // Check if the device has video capture capability
+          if (details.includes('Video Capture')) {
+            const resolutionMatch = details.match(/(\d+)x(\d+)/);
+            const fpsMatch = details.match(/(\d+) fps/);
+
+            const resolution = resolutionMatch ? resolutionMatch[0] : '640x480';
+            const fps = fpsMatch ? fpsMatch[1] : '30';
+
+            cameras.push({ device, resolution, fps });
+          }
+
         } catch (error) {
           console.error(`Failed to get details for device ${device}:`, error.message);
         }
@@ -32,10 +42,10 @@ class CameraManager {
 
   startStreams(basePort) {
     this.cameras.forEach((camera, index) => {
-      const { device } = camera;
+      const { device, resolution, fps } = camera;
       const port = basePort + index + 1;
       // Specify the input plugin and its options
-      const inputOptions = ['-i', `input_uvc.so -d ${device} -r 640x480 -f 30`];
+      const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps}`];
 
       // Specify the output plugin and its options
       const outputOptions = ['-o', `output_http.so -p ${port} -w ./www`];
