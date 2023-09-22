@@ -1,4 +1,4 @@
-const { execSync, spawn } = require('child_process');
+const {execSync, spawn} = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -23,16 +23,14 @@ class CameraManager {
           // Check if the device has video capture capability
           if (details.includes('Video Capture')) {
             // Find resolution and fps using regular expressions
-            const resolutionMatch = details.match(/\b\d{3,}x\d{3,}\b/);
-            const fpsMatch = details.match(/\bframerate: (\d+) fps\b/);
+            const resolutionMatch = details.match(/\bWidth\/Height\s*:\s*(\d+)\/(\d+)\b/);
+            const fpsMatch = details.match(/\bFrames per second\s*:\s*(\d+)\b/);
 
-            // If resolution and fps are found, add the device to the cameras array
-            if (resolutionMatch && fpsMatch) {
-              const resolution = resolutionMatch[0];
-              const fps = fpsMatch[1];
-              cameras.push({ device, resolution, fps });
+            if(resolutionMatch && fpsMatch) {
+              cameras.push({device, resolution: `${resolutionMatch[1]}x${resolutionMatch[2]}`, fps: fpsMatch[1]});
             }
           }
+
         } catch (error) {
           console.error(`Failed to get details for device ${device}:`, error.message);
         }
@@ -45,7 +43,7 @@ class CameraManager {
 
   startStreams(basePort) {
     this.cameras.forEach((camera, index) => {
-      const { device, resolution, fps } = camera;
+      const {device, resolution, fps} = camera;
       const port = basePort + index + 1;
       // Specify the input plugin and its options
       const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps}`];
