@@ -67,7 +67,7 @@ class CameraManager {
       camera.port = port;
 
       // Specify the input plugin and its options
-      const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps} -q 80`];
+      const inputOptions = ['-i', `input_uvc.so -d ${device} -r ${resolution} -f ${fps / 2} -q 80`];
 
       // Specify the output plugin and its options
       const outputOptions = ['-o', `output_http.so -w ./www -p ${port}`];
